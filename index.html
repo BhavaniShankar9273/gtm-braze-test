@@ -1,0 +1,124 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+  <meta charset="utf-8" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+  <title>GTM + Braze Beginner Test</title> 
+  <link rel="manifest" href="/manifest.json" /> 
+  <link rel="icon" href="/favicon.ico" /> 
+ 
+  <!-- Google Tag Manager --> 
+  <script> 
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': 
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], 
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src= 
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f); 
+    })(window,document,'script','dataLayer','GTM-5G7QK6CV'); 
+  </script> 
+  <!-- End Google Tag Manager --> 
+ 
+  <!-- Braze Web SDK --> 
+  <script src="https://js.appboycdn.com/web-sdk/6.5/braze.min.js" crossorigin="anonymous"></script> 
+  <style> 
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:24px;line-height:1.6} 
+    .card{max-width:760px;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:0 auto;background:#fff} 
+    h1{margin-top:0} 
+    input,button{padding:10px 12px;margin:6px 0;border-radius:8px;border:1px solid #cbd5e1} 
+    button{background:#2563eb;color:#fff;border:none;cursor:pointer} 
+    button.secondary{background:#475569} 
+    .note{color:#334155;font-size:0.95rem;background:#f1f5f9;border-left:4px solid #0ea5e9;padding:10px 12px} 
+    code{background:#f3f4f6;padding:2px 6px;border-radius:6px} 
+    .row{display:flex;gap:8px;flex-wrap:wrap} 
+  </style> 
+</head> 
+<body> 
+  <!-- Google Tag Manager (noscript) --> 
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5G7QK6CV" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript> 
+  <!-- End Google Tag Manager (noscript) --> 
+ 
+  <div class="card"> 
+    <h1>GTM + Braze Beginner Test Page</h1> 
+    <p class="note">Replace the placeholders in this file before testing: <code>GTM-5G7QK6CV</code>, <code>8eb7f299-82ad-4cc6-866a-86848b1f1838</code>, and <code>sdk.fra-02.braze.eu</code> (for example <code>https://sdk.iad-01.braze.com</code>).</p> 
+ 
+    <h3>Identify a User</h3> 
+    <div class="row"> 
+      <input id="userId" placeholder="Enter a user ID (e.g., test_user_1)" /> 
+      <button onclick="identifyUser()">Identify</button> 
+    </div> 
+ 
+    <h3>Send Events</h3> 
+    <div class="row"> 
+      <button onclick="logBrazeEvent()">Braze: Log Custom Event</button> 
+      <button class="secondary" onclick="pushToDataLayer()">GTM: dataLayer Push</button> 
+    </div> 
+ 
+    <h3>Web Push</h3> 
+    <div class="row"> 
+      <button onclick="checkPushSupport()">Check Push Support</button> 
+      <button onclick="enablePush()">Enable Push</button> 
+    </div> 
+ 
+    <pre id="output" style="white-space:pre-wrap;background:#0b1021;color:#e5e7eb;padding:12px;border-radius:8px;margin-top:12px;min-height:80px"></pre> 
+  </div> 
+ 
+  <script> 
+    // --- Braze Initialization --- 
+    // Replace placeholders below before testing 
+    const BRAZE_API_KEY = '8eb7f299-82ad-4cc6-866a-86848b1f1838'; 
+    const BRAZE_ENDPOINT = 'sdk.fra-02.braze.eu'; // e.g., https://sdk.iad-01.braze.com 
+ 
+    braze.initialize(BRAZE_API_KEY, { 
+      baseUrl: BRAZE_ENDPOINT, 
+      enableLogging: true, 
+      manageServiceWorkerExternally: true, // We'll host /service-worker.js at the site root 
+      serviceWorkerLocation: '/service-worker.js' 
+    }); 
+    braze.openSession(); 
+ 
+    // Utility to print to screen 
+    function log(msg){ 
+      const el = document.getElementById('output'); 
+      el.textContent += (msg + '\n'); 
+      console.log(msg); 
+    } 
+ 
+    // Identify user in Braze 
+    function identifyUser(){ 
+      const id = document.getElementById('userId').value || 'anonymous_' + Math.random().toString(36).slice(2,8); 
+      braze.changeUser(id); 
+      braze.getDeviceId(function(deviceId){ 
+        log('Braze user set to: ' + id + ' | deviceId: ' + deviceId); 
+      }); 
+    } 
+ 
+    // Log a Braze custom event 
+    function logBrazeEvent(){ 
+      braze.logCustomEvent('demo_event', { source: 'button', ts: Date.now() }); 
+      log('Logged Braze event: demo_event'); 
+    } 
+ 
+    // Push a GTM dataLayer event 
+    function pushToDataLayer(){ 
+      window.dataLayer = window.dataLayer || []; 
+      window.dataLayer.push({ event: 'demo_event', label: 'button_click', ts: Date.now() }); 
+      log('Pushed to dataLayer: demo_event'); 
+    } 
+ 
+    // Check push support 
+    function checkPushSupport(){ 
+      const supported = braze.isPushSupported(); 
+      log('Push supported: ' + supported); 
+    } 
+ 
+    // Request push permission 
+    async function enablePush(){ 
+      try{ 
+        await braze.requestPushPermission(); 
+        log('Push permission requested. If granted, you should see a token in Braze user profile.'); 
+      } catch(e){ 
+        log('Push request error: ' + (e && e.message ? e.message : e)); 
+      } 
+    } 
+  </script> 
+</body> 
+</html>
